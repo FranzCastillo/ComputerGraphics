@@ -3,7 +3,7 @@ from collections import namedtuple
 # import numpy as np
 from obj import Obj
 from matrixes import *
-from math import cos, sin
+from math import cos, sin, pi
 from mathLibrary import *
 
 # Save the coordinates of the vertices 
@@ -187,16 +187,17 @@ class Renderer(object):
         
         for x in range(minX, maxX + 1):
             for y in range(minY, maxY + 1):
-                P = (x,y)
-                u, v, w = getBarycentricCoordinates(A, B, C, P)
-                if 0 <= u <= 1 and 0 <= v <= 1 and 0 <= w <= 1:
-                    z = u * A[2] + v * B[2] + w * C[2]
-                    if z < self.zbuffer[x][y]:
-                        self.zbuffer[x][y] = z
-                        pixelColor = color( u * colorA[0] + v * colorB[0] + w * colorC[0],
-                                            u * colorA[1] + v * colorB[1] + w * colorC[1],
-                                            u * colorA[2] + v * colorB[2] + w * colorC[2])
-                        self.glPoint(x,y, pixelColor)
+                if (0 <= x < self.width) and (0 <= y < self.height):
+                    P = (x,y)
+                    u, v, w = getBarycentricCoordinates(A, B, C, P)
+                    if 0 <= u <= 1 and 0 <= v <= 1 and 0 <= w <= 1:
+                        z = u * A[2] + v * B[2] + w * C[2]
+                        if z < self.zbuffer[x][y]:
+                            self.zbuffer[x][y] = z
+                            pixelColor = color( u * colorA[0] + v * colorB[0] + w * colorC[0],
+                                                u * colorA[1] + v * colorB[1] + w * colorC[1],
+                                                u * colorA[2] + v * colorB[2] + w * colorC[2])
+                            self.glPoint(x,y, pixelColor)
 
     def glDrawPolygon(self, vertices, clr = None):
         for i in range(len(vertices)):
@@ -231,6 +232,8 @@ class Renderer(object):
                     self.glPoint(x, y, clr or self.currColor)
 
     def glModelMatrix(self, translate = (0,0,0), scale = (1,1,1), rotate = (0,0,0)):
+        rotate = [r * pi / 180 for r in rotate]
+        
         translationMatrix = [
             [1,0,0,translate[0]],
             [0,1,0,translate[1]],
