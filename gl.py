@@ -248,12 +248,29 @@ class Renderer(object):
             [0,0,0,1]
         ]
 
-        rotationMatrix = [
+        rotationMatrixX = [
             [1,0,0,0],
             [0,cos(rotate[0]),-sin(rotate[0]),0],
             [0,sin(rotate[0]),cos(rotate[0]),0],
             [0,0,0,1]
         ]
+        
+        rotationMatrixY = [
+            [cos(rotate[1]),0,sin(rotate[1]),0],
+            [0,1,0,0],
+            [-sin(rotate[1]),0,cos(rotate[1]),0],
+            [0,0,0,1]
+        ]
+        
+        rotationMatrixZ = [
+            [cos(rotate[2]),-sin(rotate[2]),0,0],
+            [sin(rotate[2]),cos(rotate[2]),0,0],
+            [0,0,1,0],
+            [0,0,0,1]
+        ]
+        
+        rotationMatrix = multiplyMatrices(rotationMatrixX, rotationMatrixY)
+        rotationMatrix = multiplyMatrices(rotationMatrix, rotationMatrixZ)
 
         temp = multiplyMatrices(translationMatrix, rotationMatrix)
         return multiplyMatrices(temp, scaleMatrix)
