@@ -89,7 +89,7 @@ class Renderer(object):
     def glClear(self):
         self.pixels = [[self.clearColor for _ in range(self.height)] for _ in range(self.width)]
         
-        # self.zbuffer = [[-float('inf') for _ in range(self.height)] for _ in range(self.width)]
+        self.zbuffer = [[float('inf') for _ in range(self.height)] for _ in range(self.width)]
         
     # Set the color
     def glColor(self, r, g, b):
@@ -190,18 +190,13 @@ class Renderer(object):
                 P = (x,y)
                 u, v, w = getBarycentricCoordinates(A, B, C, P)
                 if 0 <= u <= 1 and 0 <= v <= 1 and 0 <= w <= 1:
-                    pixelColor = color( u * colorA[0] + v * colorB[0] + w * colorC[0],
-                                        u * colorA[1] + v * colorB[1] + w * colorC[1],
-                                        u * colorA[2] + v * colorB[2] + w * colorC[2])
-                    self.glPoint(x,y, pixelColor or self.currColor)
-                    # z = u * A[2] + v * B[2] + w * C[2]
-                    
-                    # if z < self.zbuffer[x][y]:
-                    #     self.zbuffer[x][y] = z
-                    #     pixelColor = color( u * colorA[0] + v * colorB[0] + w * colorC[0],
-                    #                         u * colorA[1] + v * colorB[1] + w * colorC[1],
-                    #                         u * colorA[2] + v * colorB[2] + w * colorC[2])
-                    #     self.glPoint(x,y, pixelColor or self.currColor)
+                    z = u * A[2] + v * B[2] + w * C[2]
+                    if z < self.zbuffer[x][y]:
+                        self.zbuffer[x][y] = z
+                        pixelColor = color( u * colorA[0] + v * colorB[0] + w * colorC[0],
+                                            u * colorA[1] + v * colorB[1] + w * colorC[1],
+                                            u * colorA[2] + v * colorB[2] + w * colorC[2])
+                        self.glPoint(x,y, pixelColor)
 
     def glDrawPolygon(self, vertices, clr = None):
         for i in range(len(vertices)):
@@ -313,7 +308,7 @@ class Renderer(object):
                 A = primitive[0]
                 B = primitive[1]
                 C = primitive[2]
-                self.glTriangle(A, B, C, primitiveColor)
+                self.glBaricentricTriangle(A, B, C, primitiveColor)
 
     # Export the BMP file
     def glFinish(self, filename):
