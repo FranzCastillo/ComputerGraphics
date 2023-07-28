@@ -4,6 +4,7 @@ from collections import namedtuple
 from obj import Obj
 from matrixes import *
 from math import cos, sin
+from mathLibrary import *
 
 # Save the coordinates of the vertices 
 V2 = namedtuple('point', ['x','y'])
@@ -88,6 +89,8 @@ class Renderer(object):
     def glClear(self):
         self.pixels = [[self.clearColor for _ in range(self.height)] for _ in range(self.width)]
         
+        # self.zbuffer = [[-float('inf') for _ in range(self.height)] for _ in range(self.width)]
+        
     # Set the color
     def glColor(self, r, g, b):
         self.currColor = color(r,g,b)
@@ -170,6 +173,35 @@ class Renderer(object):
         self.glLine(A, B, clr or self.currColor)
         self.glLine(B, C, clr or self.currColor)
         self.glLine(C, A, clr or self.currColor)
+
+    def glBaricentricTriangle(self, A, B, C, clr = None):
+        # Bounding box
+        minX = round(min(A[0], B[0], C[0]))
+        minY = round(min(A[1], B[1], C[1]))
+        maxX = round(max(A[0], B[0], C[0]))
+        maxY = round(max(A[1], B[1], C[1]))
+        
+        colorA = (1, 0, 0)
+        colorB = (0, 1, 0)
+        colorC = (0, 0, 1)
+        
+        for x in range(minX, maxX + 1):
+            for y in range(minY, maxY + 1):
+                P = (x,y)
+                u, v, w = getBarycentricCoordinates(A, B, C, P)
+                if 0 <= u <= 1 and 0 <= v <= 1 and 0 <= w <= 1:
+                    pixelColor = color( u * colorA[0] + v * colorB[0] + w * colorC[0],
+                                        u * colorA[1] + v * colorB[1] + w * colorC[1],
+                                        u * colorA[2] + v * colorB[2] + w * colorC[2])
+                    self.glPoint(x,y, pixelColor or self.currColor)
+                    # z = u * A[2] + v * B[2] + w * C[2]
+                    
+                    # if z < self.zbuffer[x][y]:
+                    #     self.zbuffer[x][y] = z
+                    #     pixelColor = color( u * colorA[0] + v * colorB[0] + w * colorC[0],
+                    #                         u * colorA[1] + v * colorB[1] + w * colorC[1],
+                    #                         u * colorA[2] + v * colorB[2] + w * colorC[2])
+                    #     self.glPoint(x,y, pixelColor or self.currColor)
 
     def glDrawPolygon(self, vertices, clr = None):
         for i in range(len(vertices)):

@@ -2,77 +2,39 @@ from gl import Renderer, V2, V3, color
 import shaders
 
 # Modifiable parameters for the render in the rasterizer
-## Window size
+## Window size (4K size  by default)
 height = 500
-width = 1000
-outputName = 'output'
+width = 500
 
-starVertices = [
-    V2(165, 380),
-    V2(185, 360),
-    V2(180, 330),
-    V2(207, 345),
-    V2(233, 330),
-    V2(230, 360),
-    V2(250, 380),
-    V2(220, 385),
-    V2(205, 410),
-    V2(193, 383)
-]
+## Translated to the center of the screen with width/2 and height/2
+translateX = width/2
+translateY = height/2
+translateZ = 0
 
-squareVertices = [
-    V2(321, 335),
-    V2(288, 286),
-    V2(339, 251),
-    V2(374, 302),
-]
+## Original obj scale is 1, we recommend to scale it up a couple hundred times
+scaleX = 750
+scaleY = 750
+scaleZ = 750
 
-triangleVertices = [
-    V2(377, 249),
-    V2(411, 197),
-    V2(436, 249)
-]
+## Rotation in degrees
+rotateX = 0
+rotateY = 0
+rotateZ = 0
 
-teaCupVertices = [
-    V2(413, 177),
-    V2(448, 159),
-    V2(502, 88), 
-    V2(553, 53), 
-    V2(535, 36),
-    V2(676, 37),
-    V2(660, 52),
-    V2(750, 145),
-    V2(761, 179), 
-    V2(672, 192),
-    V2(659, 214), 
-    V2(615, 214),
-    V2(632, 230),
-    V2(580, 230),
-    V2(597, 215),
-    V2(552, 214), 
-    V2(517, 144),
-    V2(466, 180)
-]
-
-vertices = [
-    V2(682, 175), 
-    V2(708, 120), 
-    V2(735, 148), 
-    V2(739, 170)
-]
-
-polygons = [
-    [starVertices, color(1, 1, 0)],
-    [squareVertices, color(1, 0, 0)],
-    [triangleVertices, color(0, 1, 0)],
-    [teaCupVertices, color(1, 1, 1)],
-    [vertices, color(0, 0, 0)]
-]
+## Path to the model that can be either the absolute or relative path
+outputName = 'brg' # No need to add the extension, it'll output a bmp file
 
 render = Renderer(width, height)
 render.vertexShader = shaders.vertexShader
 render.fragmentShader = shaders.fragmentShader
-for polygon in polygons:
-    render.glFillPolygon(polygon[0], polygon[1])
+
+vertices =[
+    V2(50, 50),
+    V2(250, 450),
+    V2(450, 50)
+]
+
+render.glBaricentricTriangle(vertices[0], vertices[1], vertices[2], color(1, 0, 0))
+
 render.glRender()
 render.glFinish(outputName + '.bmp')
