@@ -1,3 +1,5 @@
+from texture import Texture
+
 class Obj(object):
     def __init__(self, filename):
         try:

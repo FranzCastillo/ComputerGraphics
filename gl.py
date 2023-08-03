@@ -5,6 +5,7 @@ from obj import Obj
 from matrixes import *
 from math import cos, sin, pi
 from mathLibrary import *
+from texture import Texture
 
 # Save the coordinates of the vertices 
 V2 = namedtuple('point', ['x','y'])
@@ -45,6 +46,9 @@ class Model(object):
         self.rotate = rotate
         self.scale = scale
 
+    def LoadTexture(self, textureName):
+        self.texture = Texture(textureName)
+
 class Renderer(object):
     # Constructor
     def __init__(self, width, height):
@@ -58,6 +62,8 @@ class Renderer(object):
         self.vertexShader = None
         self.fragmentShader = None
         self.primitiveType = TRIANGLES
+        self.activeTexture = None
+        
         self.vertexBuffer = []
 
         self.objects = []
@@ -66,7 +72,7 @@ class Renderer(object):
         for vertex in vertices:
             self.vertexBuffer.append(vertex)
        
-    def glPrimitiveAssembly(self, transformedVertices):
+    def glPrimitiveAssembly(self, transformedVertices, transformedTexCoords):
         # Assembly the vertices into points, lines or triangles
         primitives = []
 
@@ -75,7 +81,10 @@ class Renderer(object):
                 triangle = [
                     transformedVertices[i],
                     transformedVertices[i+1],
-                    transformedVertices[i+2]
+                    transformedVertices[i+2],
+                    transformedTexCoords[i],
+                    transformedTexCoords[i+1],
+                    transformedTexCoords[i+2]
                 ]
                 primitives.append(triangle)
     
@@ -174,16 +183,12 @@ class Renderer(object):
         self.glLine(B, C, clr or self.currColor)
         self.glLine(C, A, clr or self.currColor)
 
-    def glBaricentricTriangle(self, A, B, C, clr = None):
+    def glBaricentricTriangle(self, A, B, C, vtA, vtB, vtC):
         # Bounding box
         minX = round(min(A[0], B[0], C[0]))
         minY = round(min(A[1], B[1], C[1]))
         maxX = round(max(A[0], B[0], C[0]))
         maxY = round(max(A[1], B[1], C[1]))
-        
-        colorA = (1, 0, 0)
-        colorB = (0, 1, 0)
-        colorC = (0, 0, 1)
         
         for x in range(minX, maxX + 1):
             for y in range(minY, maxY + 1):
@@ -194,10 +199,15 @@ class Renderer(object):
                         z = u * A[2] + v * B[2] + w * C[2]
                         if z < self.zbuffer[x][y]:
                             self.zbuffer[x][y] = z
-                            pixelColor = color( u * colorA[0] + v * colorB[0] + w * colorC[0],
-                                                u * colorA[1] + v * colorB[1] + w * colorC[1],
-                                                u * colorA[2] + v * colorB[2] + w * colorC[2])
-                            self.glPoint(x,y, pixelColor)
+                            uvs = ( u * vtA[0] + v * vtB[0] + w * vtC[0],
+                                    u * vtA[1] + v * vtB[1] + w * vtC[1])
+                            
+                            if self.fragmentShader != None:
+                                pixelValues = self.fragmentShader(texCoords = uvs, texture = self.activeTexture)
+                                pixelColor = color(pixelValues[0], pixelValues[1], pixelValues[2])
+                                self.glPoint(x, y, pixelColor)
+                            else:
+                                self.glPoint(x, y, pixelColor)
 
     def glDrawPolygon(self, vertices, clr = None):
         for i in range(len(vertices)):
@@ -275,14 +285,17 @@ class Renderer(object):
         temp = multiplyMatrices(translationMatrix, rotationMatrix)
         return multiplyMatrices(temp, scaleMatrix)
 
-    def glLoadModel(self, filename, translate = (0,0,0), scale = (1,1,1), rotate = (0,0,0)):
+    def glLoadModel(self, filename, textureName, translate = (0,0,0), scale = (1,1,1), rotate = (0,0,0)):
         model = Model(filename, translate, rotate, scale)
+        model.LoadTexture(textureName)
         self.objects.append(model)
 
     def glRender(self):
         transformedVerts = []
+        textureCoords = []
 
         for model in self.objects:
+            self.activeTexture = model.texture
             modelMatrix = self.glModelMatrix(model.translate, model.scale, model.rotate)
 
             for face in model.faces:
@@ -309,26 +322,35 @@ class Renderer(object):
                     transformedVerts.append(v2)
                     transformedVerts.append(v3)
 
+                vt0 = model.texcoords[face[0][1] - 1]
+                vt1 = model.texcoords[face[1][1] - 1]
+                vt2 = model.texcoords[face[2][1] - 1]
+                if vcount == 4:
+                    vt3 = model.texcoords[face[3][1] - 1]
+                
+                textureCoords.append(vt0)
+                textureCoords.append(vt1)
+                textureCoords.append(vt2)
+                if vcount == 4:
+                    textureCoords.append(vt0)
+                    textureCoords.append(vt2)
+                    textureCoords.append(vt3)
+
         for vert in self.vertexBuffer:
             transformedVerts.append(vert)
 
-        primitives = self.glPrimitiveAssembly(transformedVerts)
-        primitiveColor = self.currColor
-        if self.fragmentShader:
-            primitiveColor = self.fragmentShader()
-            primitiveColor = color(
-                primitiveColor[0],
-                primitiveColor[1],
-                primitiveColor[2]
-            )
-     
+        primitives = self.glPrimitiveAssembly(transformedVerts, textureCoords)
+    
 
         for primitive in primitives:
             if self.primitiveType == TRIANGLES:
                 A = primitive[0]
                 B = primitive[1]
                 C = primitive[2]
-                self.glBaricentricTriangle(A, B, C, primitiveColor)
+                D = primitive[3]
+                E = primitive[4]
+                F = primitive[5]
+                self.glBaricentricTriangle(A, B, C, D, E, F)
 
     # Export the BMP file
     def glFinish(self, filename):

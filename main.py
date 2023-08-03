@@ -2,38 +2,54 @@ from gl import Renderer, V2, V3, color
 import shaders
 
 # Modifiable parameters for the render in the rasterizer
-## Window size (4K size  by default)
-width = 512
-height = 512
-
-## Translated to the center of the screen with width/2 and height/2
-translateX = width/2
-translateY = height/2
-translateZ = 0
+width = 1000
+height = 1000
 
 ## Original obj scale is 1, we recommend to scale it up a couple hundred times
-scaleX = 200
-scaleY = 200
-scaleZ = 200
+scaleX = 425
+scaleY = 425
+scaleZ = 425
 
-## Rotation in degrees
-rotateX = 0
-rotateY = 90
-rotateZ = 0
 
 ## Path to the model that can be either the absolute or relative path
-path = 'model.obj'
-outputName = 'person' # No need to add the extension, it'll output a bmp file
+objPath = 'obj\pumpkin.obj'
+texturePath = 'textures\pumpkin.bmp'
+outputName = 'pumpkin' # No need to add the extension, it'll output a bmp file
 
 render = Renderer(width, height)
 render.vertexShader = shaders.vertexShader
 render.fragmentShader = shaders.fragmentShader
 render.glLoadModel(
-    path, 
-    translate=(translateX, translateY, translateZ), 
+    objPath,
+    texturePath,
+    translate=(175, 0, 0), 
     scale=(scaleX, scaleY, scaleZ),
-    rotate=(rotateX, rotateY, rotateZ)
+    rotate=(0, 180, 0)
+)
+
+render.glLoadModel(
+    objPath,
+    texturePath,
+    translate=(800, 0, 0),
+    scale=(scaleX, scaleY, scaleZ),
+    rotate=(0, 90, 0)
+)
+
+render.glLoadModel(
+    objPath,
+    texturePath,
+    translate=(175, 800, 0),
+    scale=(scaleX, scaleY, scaleZ),
+    rotate=(90, 0, 0)
+)
+
+render.glLoadModel(
+    objPath,
+    texturePath,
+    translate=(800, 800, 0),
+    scale=(scaleX, scaleY, scaleZ),
+    rotate=(-90, 0, 0)
 )
 
 render.glRender()
-render.glFinish(outputName + '.bmp')
+render.glFinish("output/" + outputName + '.bmp')
