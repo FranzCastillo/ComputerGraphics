@@ -1,55 +1,38 @@
-from gl import Renderer, V2, V3, color
+from gl import Renderer
 import shaders
 
-# Modifiable parameters for the render in the rasterizer
-width = 1000
-height = 1000
+# Modifiable parameters for the render
+modelPath = "models/model.obj"
+texturePath = "textures/model.bmp"
+outputPath = "output/output.bmp"
 
-## Original obj scale is 1, we recommend to scale it up a couple hundred times
-scaleX = 425
-scaleY = 425
-scaleZ = 425
+width = 960
+height = 540
 
+scale = 2
 
-## Path to the model that can be either the absolute or relative path
-objPath = 'obj\pumpkin.obj'
-texturePath = 'textures\pumpkin.bmp'
-outputName = 'pumpkin' # No need to add the extension, it'll output a bmp file
+cameraPositionX = -3
+cameraPositionY = -1
+cameraPositionZ = -2
+
+eyePositionX = 0
+eyePositionY = 0
+eyePositionZ = -5
+
 
 render = Renderer(width, height)
 render.vertexShader = shaders.vertexShader
 render.fragmentShader = shaders.fragmentShader
-render.glLoadModel(
-    objPath,
-    texturePath,
-    translate=(175, 0, 0), 
-    scale=(scaleX, scaleY, scaleZ),
-    rotate=(0, 180, 0)
-)
 
-render.glLoadModel(
-    objPath,
-    texturePath,
-    translate=(800, 0, 0),
-    scale=(scaleX, scaleY, scaleZ),
-    rotate=(0, 90, 0)
-)
+render.glLookAt(
+    camPos = (cameraPositionX, cameraPositionY, cameraPositionZ), 
+    eyePos= (eyePositionX, eyePositionY, eyePositionZ))
 
-render.glLoadModel(
-    objPath,
-    texturePath,
-    translate=(175, 800, 0),
-    scale=(scaleX, scaleY, scaleZ),
-    rotate=(90, 0, 0)
-)
-
-render.glLoadModel(
-    objPath,
-    texturePath,
-    translate=(800, 800, 0),
-    scale=(scaleX, scaleY, scaleZ),
-    rotate=(-90, 0, 0)
-)
+render.glLoadModel(filename = "models/model.obj",
+                 textureName = "textures/model.bmp",
+                 translate = (0, 0, -5),
+                 rotate = (0, 0, 0),
+                 scale = (scale, scale, scale))
 
 render.glRender()
-render.glFinish("output/" + outputName + '.bmp')
+render.glFinish(outputPath)

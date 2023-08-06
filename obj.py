@@ -1,30 +1,35 @@
-from texture import Texture
 
 class Obj(object):
     def __init__(self, filename):
-        try:
-            with open(filename, "r") as file:
-                self.lines = file.read().splitlines()
+        # Asumiendo que el archivo es un formato .obj
+        with open(filename,"r") as file:
+            self.lines = file.read().splitlines()
 
-            self.vertices = []
-            self.normals = []
-            self.texcoords = []
-            self.faces = []
+        # Se crean los contenedores de los datos del modelo.
+        self.vertices = []
+        self.texcoords = []
+        self.normals = []
+        self.faces = []
 
-            for line in self.lines:
-                if line:
-                    prefix, value = line.split(' ', 1)
+        # Por cada línea en el archivo
+        for line in self.lines:
+            # Si la línea no cuenta con un prefijo y un valor,
+            # seguimos a la siguiente línea
+            try:
+                prefix, value = line.split(" ", 1)
+            except:
+                continue
 
-                    if prefix == 'v': # Vertex
-                        self.vertices.append(list(map(float, value.split(' '))))
-                    elif prefix == 'vn': # Normal
-                        self.normals.append(list(map(float, value.split(' '))))
-                    elif prefix == 'vt': # Texture Coordinate
-                        self.texcoords.append(list(map(float, value.split(' '))))
-                    elif prefix == 'f': # Face
-                        if '//' in value:
-                            self.faces.append([list(map(int, vert.split('//'))) for vert in value.split(' ')])
-                        else:
-                            self.faces.append([list(map(int, vert.split('/'))) for vert in value.split(' ')])
-        except:
-            raise Exception(f"The file {filename} can't be opened. Please check the path")
+            # Dependiendo del prefijo, parseamos y guardamos la información
+            # en el contenedor correcto
+
+            if prefix == "v": # Vertices
+                self.vertices.append( list(map(float, value.split(" "))) )
+            elif prefix == "vt": # Texture Coordinates
+                self.texcoords.append( list(map(float, value.split(" "))) )
+            elif prefix == "vn": # Normals
+                self.normals.append( list(map(float, value.split(" "))) )
+            elif prefix == "f": # Faces
+                self.faces.append([list(map(int, vert.split("/"))) for vert in value.split(" ") ] )
+
+    
