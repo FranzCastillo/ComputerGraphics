@@ -1,3 +1,5 @@
+from matrixes import *
+
 def vertexShader(vertex, **kwargs):
     modelMatrix = kwargs["modelMatrix"]
     viewMatrix = kwargs["viewMatrix"]
@@ -9,8 +11,11 @@ def vertexShader(vertex, **kwargs):
           vertex[2],
           1]
 
-    vt = vpMatrix * projectionMatrix * viewMatrix * modelMatrix @ vt
-    vt = vt.tolist()[0]
+    # vt = vpMatrix * projectionMatrix * viewMatrix * modelMatrix @ vt
+    temp = multiplyMatrices(vpMatrix, projectionMatrix)
+    temp = multiplyMatrices(temp, viewMatrix)
+    temp = multiplyMatrices(temp, modelMatrix)
+    vt = multiplyMatrixVector(temp, vt)
     vt = [vt[0]/vt[3],
           vt[1]/vt[3],
           vt[2]/vt[3]]

@@ -100,12 +100,14 @@ def inverse(matrix):
 
     return inverse_matrix
 
-def subtract(arr1, arr2):
-    if arr1.shape != arr2.shape:
-        raise ValueError("Input arrays must have the same shape")
-
-    # Perform element-wise subtraction
-    result = arr1 - arr2
+def subtract(tuple1, tuple2):
+    if len(tuple1) != len(tuple2):
+        raise ValueError("Tuples must have the same length")
+    
+    result = []
+    for i in range(len(tuple1)):
+        result.append(tuple1[i] - tuple2[i])
+    
     return result
 
 def crossProduct(arr1, arr2):
@@ -120,13 +122,16 @@ def crossProduct(arr1, arr2):
     ]
     return cross_product
 
-def norm(arr):
-    if len(arr.shape) != 1:
-        raise ValueError("Input array must be 1D")
+def norm(listParam):
+    result = 0
+    for i in range(len(listParam)):
+        result += listParam[i] ** 2
+    
+    return math.sqrt(result)
 
-    # Calculate the sum of squares
-    sum_of_squares = sum(x ** 2 for x in arr)
-
-    # Calculate the square root of the sum of squares to get the norm
-    norm = math.sqrt(sum_of_squares)
-    return norm
+def divisionVectorEscalar(vector, escalar):
+    result = []
+    for i in range(len(vector)):
+        result.append(vector[i] / escalar)
+    
+    return result

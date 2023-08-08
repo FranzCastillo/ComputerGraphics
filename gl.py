@@ -1,8 +1,9 @@
 import struct
-import numpy as np
+# import numpy as np
 from math import pi, sin, cos, tan
 from mathLibrary import *
 from model import Model
+from matrixes import *
 
 def char(c):
     # 1 byte
@@ -116,33 +117,33 @@ class Renderer(object):
         self.vpY = y
         self.vpWidth = width
         self.vpHeight = height
-        self.vpMatrix = np.matrix([[self.vpWidth/2,0,0,self.vpX+self.vpWidth/2],
+        self.vpMatrix = [[self.vpWidth/2,0,0,self.vpX+self.vpWidth/2],
                                    [0,self.vpHeight/2,0,self.vpY+self.vpHeight/2],
                                    [0,0,0.5,0.5],
-                                   [0,0,0,1]])
+                                   [0,0,0,1]]
 
     def glCamMatrix(self, translate = (0,0,0), rotate = (0,0,0)):
         self.camMatrix = self.glModelMatrix(translate, rotate)
-        self.viewMatrix = np.linalg.inv(self.camMatrix)
+        self.viewMatrix = inverse(self.camMatrix)
           
     def glLookAt(self, camPos = (0,0,0), eyePos = (0,0,0)):
         worldUp = (0,1,0)
         
-        forward = np.subtract(camPos, eyePos)
-        forward = forward / np.linalg.norm(forward)
+        forward = subtract(camPos, eyePos)
+        forward = divisionVectorEscalar(forward, norm(forward))
         
-        right = np.cross(worldUp, forward)
-        right = right / np.linalg.norm(right)
+        right = crossProduct(worldUp, forward)
+        right = divisionVectorEscalar(right, norm(right))
         
-        up = np.cross(forward, right)
-        up = up / np.linalg.norm(up)
+        up = crossProduct(forward, right)
+        up = divisionVectorEscalar(up, norm(up))
         
-        self.camMatrix = np.matrix([[right[0],up[0],forward[0],camPos[0]],
+        self.camMatrix = [[right[0],up[0],forward[0],camPos[0]],
                                     [right[1],up[1],forward[1],camPos[1]],
                                     [right[2],up[2],forward[2],camPos[2]],
-                                    [0,0,0,1]])
+                                    [0,0,0,1]]
         
-        self.viewMatrix = np.linalg.inv(self.camMatrix)
+        self.viewMatrix = inverse(self.camMatrix)
         
     def glProjectionMatrix(self, fov = 60, n = 0.1, f = 1000):
         aspectRatio = self.vpWidth/self.vpHeight
@@ -151,25 +152,26 @@ class Renderer(object):
         
         r = t * aspectRatio
         
-        self.projectionMatrix = np.matrix([[n/r,0,0,0],
+        self.projectionMatrix = [[n/r,0,0,0],
                                            [0,n/t,0,0],
                                            [0,0,-(f+n)/(f-n),(-2*f*n)/(f-n)],
-                                           [0,0,-1,0]])
+                                           [0,0,-1,0]]
     
     def glModelMatrix(self, translate = (0,0,0), rotate = (0,0,0), scale = (1,1,1)):
-        translation = np.matrix([[1,0,0,translate[0]],
+        translation = [[1,0,0,translate[0]],
                                  [0,1,0,translate[1]],
                                  [0,0,1,translate[2]],
-                                 [0,0,0,1]])
+                                 [0,0,0,1]]
 
         rotMat = self.glRotationMatrix(rotate[0], rotate[1], rotate[2])
 
-        scaleMat = np.matrix([[scale[0],0,0,0],
+        scaleMat = [[scale[0],0,0,0],
                               [0,scale[1],0,0],
                               [0,0,scale[2],0],
-                              [0,0,0,1]])
+                              [0,0,0,1]]
         
-        return translation * rotMat * scaleMat
+        # return translation * rotMat * scaleMat
+        return multiplyMatrices(multiplyMatrices(translation, rotMat), scaleMat)
 
 
     def glRotationMatrix(self, pitch = 0, yaw = 0, roll = 0):
@@ -177,22 +179,23 @@ class Renderer(object):
         yaw *= pi / 180
         roll *= pi / 180
 
-        pitchMat = np.matrix([[1,0,0,0],
+        pitchMat = [[1,0,0,0],
                               [0,cos(pitch),-sin(pitch),0],
                               [0,sin(pitch),cos(pitch),0],
-                              [0,0,0,1]])
+                              [0,0,0,1]]
 
-        yawMat = np.matrix([[cos(yaw),0,sin(yaw),0],
+        yawMat = [[cos(yaw),0,sin(yaw),0],
                             [0,1,0,0],
                             [-sin(yaw),0,cos(yaw),0],
-                            [0,0,0,1]])
+                            [0,0,0,1]]
 
-        rollMat = np.matrix([[cos(roll),-sin(roll),0,0],
+        rollMat = [[cos(roll),-sin(roll),0,0],
                              [sin(roll),cos(roll),0,0],
                              [0,0,1,0],
-                             [0,0,0,1]])
+                             [0,0,0,1]]
 
-        return pitchMat * yawMat * rollMat
+        # return pitchMat * yawMat * rollMat
+        return multiplyMatrices(multiplyMatrices(pitchMat, yawMat), rollMat)
 
 
 
