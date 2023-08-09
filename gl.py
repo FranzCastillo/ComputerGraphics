@@ -70,10 +70,8 @@ class Renderer(object):
         minY = round(min(A[1], B[1], C[1]))
         maxY = round(max(A[1], B[1], C[1]))
 
-        # Para cada pixel dentro del bounding box
         for x in range(minX, maxX + 1):
             for y in range(minY, maxY + 1):
-                # Si el pixel est� dentro del FrameBuffer
                 if (0 <= x < self.width) and (0 <= y < self.height):
                     P = (x,y)
                     bCoords = getBarycentricCoords(A, B, C, P)
