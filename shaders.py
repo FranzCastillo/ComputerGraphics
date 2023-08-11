@@ -74,3 +74,42 @@ def gouradShader(**kwargs):
     color = [max(0, min(1, c * intensity)) for c in color]
     
     return color
+
+def thermalToonShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+    
+    normal=[u * nA[0] + v * nB[0] + w * nC[0],
+            u * nA[1] + v * nB[1] + w * nC[1],
+            u * nA[2] + v * nB[2] + w * nC[2]]
+    
+    dLight = np.array(dLight)
+    
+    color = [1, 1, 1]
+    intensity = np.dot(normal, -dLight)
+    
+    if intensity > 0.85:
+        color = [1, 0, 0]
+    elif intensity > 0.6:
+        color = [1, 0.5, 0]
+    elif intensity > 0.45:
+        color = [1, 1, 0]
+    elif intensity > 0.3:
+        color = [0, 1, 0]
+    elif intensity > 0.15:
+        color = [0, 1, 1]
+    elif intensity > 0:
+        color = [0, 0, 1]
+    else:
+        color = [0, 0, 0]
+    
+    if texture != None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        color = [c * t for c, t in zip(color, textureColor)]
+    
+    return color

@@ -38,7 +38,7 @@ class Renderer(object):
         self.primitiveType = TRIANGLES
         self.activeTexture = None
         
-        self.direcitonalLigth = (1, 0, 0)
+        self.direcitonalLigth = (0, 0, -1)
         
         self.glClearColor(0,0,0)
         self.glClear()
@@ -64,6 +64,8 @@ class Renderer(object):
         if (0 <= x < self.width) and (0 <= y < self.height):
             self.pixels[x][y] = clr or self.currColor
 
+    def glDirectionalLightDirection(self, x, y, z):
+        self.direcitonalLigth = (x, y, z)
 
     def glTriangle(self, verts, texCoords, normals):
         A = verts[0]
