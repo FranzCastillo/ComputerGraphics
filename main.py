@@ -2,8 +2,8 @@ from gl import Renderer
 import shaders
 
 # Modifiable parameters for the render
-modelPath = "models/pumpkin.obj"
-texturePath = "textures/pumpkin.bmp"
+modelPath = "models/model.obj"
+texturePath = "textures/model.bmp"
 outputPath = "output/output.bmp"
 
 width = 512
@@ -16,7 +16,7 @@ render.glDirectionalLightDirection(1, 0, 1)
 render.glClearColor(0.65, 0.65, 0.65)
 render.glClear()
 render.vertexShader = shaders.vertexShader
-render.fragmentShader = shaders.thermalToonShader
+render.fragmentShader = shaders.negativeShader
 
 render.glLoadModel(filename = modelPath,
                  textureName = texturePath,
