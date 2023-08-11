@@ -15,7 +15,7 @@ render = Renderer(width, height)
 render.glClearColor(0.65, 0.65, 0.65)
 render.glClear()
 render.vertexShader = shaders.vertexShader
-render.fragmentShader = shaders.flatShader
+render.fragmentShader = shaders.gouradShader
 
 render.glLoadModel(filename = modelPath,
                  textureName = texturePath,

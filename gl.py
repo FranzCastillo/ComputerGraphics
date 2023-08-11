@@ -65,7 +65,11 @@ class Renderer(object):
             self.pixels[x][y] = clr or self.currColor
 
 
-    def glTriangle(self, A, B, C, vtA, vtB, vtC, triangleNormal):
+    def glTriangle(self, verts, texCoords, normals):
+        A = verts[0]
+        B = verts[1]
+        C = verts[2]
+        
         minX = round(min(A[0], B[0], C[0]))
         maxX = round(max(A[0], B[0], C[0]))
         minY = round(min(A[1], B[1], C[1]))
@@ -86,32 +90,44 @@ class Renderer(object):
                         if z < self.zbuffer[x][y]:
                             self.zbuffer[x][y] = z
                             
-                            uvs = (u * vtA[0] + v * vtB[0] + w * vtC[0],
-                                   u * vtA[1] + v * vtB[1] + w * vtC[1])
-                            
                             if self.fragmentShader != None:
-                                colorP = self.fragmentShader(texCoords = uvs,
-                                                             texture = self.activeTexture,
-                                                             triangleNormal = triangleNormal,
-                                                             dLight = self.direcitonalLigth)
+                                colorP = self.fragmentShader(texture = self.activeTexture,
+                                                             texCoords = texCoords,
+                                                             normals = normals,
+                                                             dLight = self.direcitonalLigth,
+                                                             bCoords = bCoords,)
 
                                 self.glPoint(x, y, color(colorP[0], colorP[1], colorP[2]))
                             else:
                                 self.glPoint(x, y)
 
 
-    def glPrimitiveAssembly(self, tVerts, tTexCoords, normals):
+    def glPrimitiveAssembly(self, tVerts, tTexCoords, tNormals):
         primitives = [ ]
         if self.primitiveType == TRIANGLES:
             for i in range(0, len(tVerts), 3):
-                triangle = [
+                verts = [
                     tVerts[i],
                     tVerts[i + 1],
                     tVerts[i + 2],
+                ]
+                
+                texCoords = [
                     tTexCoords[i],
                     tTexCoords[i + 1],
                     tTexCoords[i + 2],
-                    normals[int(i / 3)]
+                ]
+                
+                normals = [
+                    tNormals[i],
+                    tNormals[i + 1],
+                    tNormals[i + 2],
+                ]
+                
+                triangle = [
+                    verts,
+                    texCoords,
+                    normals,
                 ]
                 primitives.append(triangle)
         return primitives
@@ -269,13 +285,13 @@ class Renderer(object):
                 if vertCount == 4:
                     v3 = model.vertices[ face[3][0] - 1]
                     
-                triangleNormal0 = np.cross(np.subtract(v1, v0), np.subtract(v2, v0))
-                triangleNormal0 = triangleNormal0 / np.linalg.norm(triangleNormal0)
-                normals.append(triangleNormal0)
-                if vertCount == 4:
-                    triangleNormal1 = np.cross(np.subtract(v2, v0), np.subtract(v3, v0))
-                    triangleNormal1 = triangleNormal1 / np.linalg.norm(triangleNormal1)
-                    normals.append(triangleNormal1)
+                # triangleNormal0 = np.cross(np.subtract(v1, v0), np.subtract(v2, v0))
+                # triangleNormal0 = triangleNormal0 / np.linalg.norm(triangleNormal0)
+                # normals.append(triangleNormal0)
+                # if vertCount == 4:
+                #     triangleNormal1 = np.cross(np.subtract(v2, v0), np.subtract(v3, v0))
+                #     triangleNormal1 = triangleNormal1 / np.linalg.norm(triangleNormal1)
+                #     normals.append(triangleNormal1)
                     
 
                 if self.vertexShader:
@@ -320,14 +336,26 @@ class Renderer(object):
                     texCoords.append(vt0)
                     texCoords.append(vt2)
                     texCoords.append(vt3)
+                    
+                vn0 = model.normals[face[0][2] - 1]
+                vn1 = model.normals[face[1][2] - 1]
+                vn2 = model.normals[face[2][2] - 1]
+                if vertCount == 4:
+                    vn3 = model.texcoords[face[3][2] - 1]
+                    
+                normals.append(vn0)
+                normals.append(vn1)
+                normals.append(vn2)
+                if vertCount == 4:
+                    normals.append(vn0)
+                    normals.append(vn2)
+                    normals.append(vn3)
 
         primitives = self.glPrimitiveAssembly(transformedVerts, texCoords, normals)       
 
         for prim in primitives:
             if self.primitiveType ==  TRIANGLES:
-                self.glTriangle(prim[0], prim[1], prim[2],
-                                prim[3], prim[4], prim[5],
-                                prim[6])
+                self.glTriangle(prim[0], prim[1], prim[2])
         
     def glFinish(self, filename):
         with open(filename, "wb") as file:
