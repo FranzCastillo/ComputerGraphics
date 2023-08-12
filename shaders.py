@@ -174,3 +174,42 @@ def xRayShader(**kwargs):
         textureColor = texture.getColor(tU, tV)
         color = [1 - c * t for c, t in zip(color, textureColor)]
     return color
+
+def newShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+    width = kwargs["width"]
+    height = kwargs["height"]
+    
+    normal=[u * nA[0] + v * nB[0] + w * nC[0],
+            u * nA[1] + v * nB[1] + w * nC[1],
+            u * nA[2] + v * nB[2] + w * nC[2]]
+    
+    dLight = np.array(dLight)
+    
+    intensity = np.dot(normal, -dLight)
+    
+    color = [0.65, 0.65, 0.65]
+    
+    showTexture = False
+    
+    # for norm in normal:
+    #     if norm < -0.2:
+    #         showTexture = not showTexture
+    
+    if intensity > 0.6:
+        showTexture = True
+    
+    if texture != None:
+        if showTexture:
+            tU = tA[0] * u + tB[0] * v + tC[0] * w
+            tV = tA[1] * u + tB[1] * v + tC[1] * w
+            textureColor = texture.getColor(tU, tV)
+            color = [c * t for c, t in zip(color, textureColor)]
+        else:
+            color = [max(0, min(1, c * intensity)) for c in color]
+            
+    return color

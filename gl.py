@@ -97,7 +97,9 @@ class Renderer(object):
                                                              texCoords = texCoords,
                                                              normals = normals,
                                                              dLight = self.direcitonalLigth,
-                                                             bCoords = bCoords,)
+                                                             bCoords = bCoords,
+                                                             width = self.vpWidth,
+                                                             height = self.vpHeight,)
 
                                 self.glPoint(x, y, color(colorP[0], colorP[1], colorP[2]))
                             else:
