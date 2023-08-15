@@ -271,3 +271,23 @@ def transparentShader(**kwargs):
             color = [c * t for c, t in zip(color, textureColor)]
             
     return color
+
+def blackAndWhite(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    u, v, w = kwargs["bCoords"]
+    
+    color = [0.65, 0.65, 0.65]
+    
+    if texture != None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        
+        gray = (textureColor[0] + textureColor[1] + textureColor[2]) / 3
+        
+        color = [gray, gray, gray]
+        
+            
+    return color   
+    
