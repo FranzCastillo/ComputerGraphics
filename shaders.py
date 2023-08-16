@@ -289,5 +289,119 @@ def blackAndWhite(**kwargs):
         color = [gray, gray, gray]
         
             
-    return color   
+    return color
+
+def contrastShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    u, v, w = kwargs["bCoords"]
     
+    color = [0.65, 0.65, 0.65]
+    
+    if texture != None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        
+        contrastColor = [0, 0, 0]
+        for i in range(3):
+            if textureColor[i] > 0.4:
+                contrastColor[i] = 1
+            else:
+                contrastColor[i] = 0
+                
+        color = contrastColor
+        
+    return color
+
+def adjustedContrast(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    u, v, w = kwargs["bCoords"]
+    
+    color = [0.65, 0.65, 0.65]
+    
+    if texture != None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        color = texture.getColor(tU, tV)
+        
+    avg = (color[0] + color[1] + color[2]) / 3
+    
+    contrastFactor = 8
+    
+    newRed = avg + (color[0] - avg) * contrastFactor
+    newGreen = avg + (color[1] - avg) * contrastFactor
+    newBlue = avg + (color[2] - avg) * contrastFactor
+    
+    color = [newRed, newGreen, newBlue]
+    
+    for i in range(3):
+        color[i] = max(0, min(1, color[i]))
+        
+    return color
+
+def colorTinting(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    u, v, w = kwargs["bCoords"]
+    
+    color = [0.65, 0.65, 0.65]
+    
+    if texture != None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        
+        red = textureColor[0]
+        green = textureColor[1]
+        blue = textureColor[2]
+        
+        tintFactor = 0.5
+        
+        redTint, greenTint, blueTint = 0, 0, 0.5
+        
+        tintedRed = red * redTint
+        tintedGreen = green * greenTint
+        tintedBlue = blue * blueTint
+        
+        finalRed = tintedRed + (1 - tintFactor) * redTint
+        finalGreen = tintedGreen + (1 - tintFactor) * greenTint
+        finalBlue = tintedBlue + (1 - tintFactor) * blueTint
+        
+        finalRed = min(1, max(0, finalRed))
+        finalGreen = min(1, max(0, finalGreen))
+        finalBlue = min(1, max(0, finalBlue))
+        
+        color = [finalRed, finalGreen, finalBlue]
+        
+    return color
+
+def posterizationShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    u, v, w = kwargs["bCoords"]
+    
+    color = [0.65, 0.65, 0.65]
+    
+    if texture != None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        
+        levels = 5
+        
+        step = 1.0 / levels
+        
+        red = textureColor[0]
+        green = textureColor[1]
+        blue = textureColor[2]
+        
+        posterizerRed = int(red / step) * step
+        posterizerGreen = int(green / step) * step
+        posterizerBlue = int(blue / step) * step
+        
+        color = [posterizerRed, posterizerGreen, posterizerBlue]
+        
+    return color
+        

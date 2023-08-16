@@ -16,7 +16,7 @@ render.glDirectionalLightDirection(1, 0, 0)
 render.glClearColor(0.65, 0.65, 0.65)
 render.glClear()
 render.vertexShader = shaders.vertexShader
-render.fragmentShader = shaders.blackAndWhite
+render.fragmentShader = shaders.posterizationShader
 
 render.glLoadModel(filename = modelPath,
                  textureName = texturePath,
