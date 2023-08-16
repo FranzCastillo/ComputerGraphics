@@ -1,3 +1,4 @@
+import random
 import numpy as np
 
 def vertexShader(vertex, **kwargs):
@@ -305,7 +306,7 @@ def contrastShader(**kwargs):
         
         contrastColor = [0, 0, 0]
         for i in range(3):
-            if textureColor[i] > 0.4:
+            if textureColor[i] > 0.55:
                 contrastColor[i] = 1
             else:
                 contrastColor[i] = 0
@@ -357,7 +358,7 @@ def colorTinting(**kwargs):
         green = textureColor[1]
         blue = textureColor[2]
         
-        tintFactor = 0.5
+        tintFactor = 0.2
         
         redTint, greenTint, blueTint = 0, 0, 0.5
         
@@ -389,7 +390,7 @@ def posterizationShader(**kwargs):
         tV = tA[1] * u + tB[1] * v + tC[1] * w
         textureColor = texture.getColor(tU, tV)
         
-        levels = 5
+        levels = 6
         
         step = 1.0 / levels
         
@@ -404,4 +405,77 @@ def posterizationShader(**kwargs):
         color = [posterizerRed, posterizerGreen, posterizerBlue]
         
     return color
+
+def gradient(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+
+    normal = [u * nA[0] + v * nB[0] + w * nC[0],
+              u * nA[1] + v * nB[1] + w * nC[1],
+              u * nA[2] + v * nB[2] + w * nC[2]]
+
+    dLight = np.array(dLight)
+    intensity = np.dot(normal, -dLight)
+
+    color_start = [1, 0, 0]
+    color_end = [0, 0, 1]
+
+    gradient_color = [color_start[i] + intensity * (color_end[i] - color_start[i]) for i in range(3)]
+    color = gradient_color
+    
+
+    if texture is not None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        blended_color = [(gradient_color[i] + textureColor[i]) / 2 for i in range(3)]
+        color = blended_color
+        for i in range(3):
+            color[i] = max(0, min(1, color[i]))
+    return color
+
+def nightVision(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+    
+    normal=[u * nA[0] + v * nB[0] + w * nC[0],
+            u * nA[1] + v * nB[1] + w * nC[1],
+            u * nA[2] + v * nB[2] + w * nC[2]]
+    
+    dLight = np.array(dLight)
+    intensity = np.dot(normal, -dLight)
+    color = [0.4, 0.6, 0.2]
+    saturation = 0
+    
+    if texture != None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        red = (1 -saturation) * textureColor[0]
+        green = (1 - saturation) * textureColor[1]
+        blue = (1 - saturation) * textureColor[2]
         
+        if intensity > 0:
+            red += (1 - saturation) * intensity
+            green += (1 - saturation) * intensity
+            blue += (1 - saturation) * intensity
+        
+        saturation += 3
+        
+        red = (1 - saturation) * red + saturation * color[0]
+        green = (1 - saturation) * green + saturation * color[1]
+        blue = (1 - saturation) * blue + saturation * color[2]
+        
+        red = min(1, max(0, red))
+        green = min(1, max(0, green))
+        blue = min(1, max(0, blue))
+        
+        color = [red, green, blue]
+        
+    return color
