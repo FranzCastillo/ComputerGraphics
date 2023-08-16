@@ -198,4 +198,4 @@ def nightVision(outputPath):
 # colorTinting("output/shaders/colorTinting.bmp")
 # posterization("output/shaders/posterization.bmp")
 # gradient("output/shaders/gradient.bmp")
-# nightVision("output/shaders/nightVision.bmp")
+nightVision("output/shaders/nightVision.bmp")

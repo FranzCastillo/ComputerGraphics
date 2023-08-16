@@ -1,5 +1,6 @@
 import random
-import numpy as np
+# import numpy as np
+from matrixes import *
 
 def vertexShader(vertex, **kwargs):
     modelMatrix = kwargs["modelMatrix"]
@@ -12,8 +13,10 @@ def vertexShader(vertex, **kwargs):
           vertex[2],
           1]
 
-    vt = vpMatrix * projectionMatrix * viewMatrix * modelMatrix @ vt
-    vt = vt.tolist()[0]
+    vt = multiplyMatrixVector(modelMatrix, vt)
+    vt = multiplyMatrixVector(viewMatrix, vt)
+    vt = multiplyMatrixVector(projectionMatrix, vt)
+    vt = multiplyMatrixVector(vpMatrix, vt)
     vt = [vt[0]/vt[3],
           vt[1]/vt[3],
           vt[2]/vt[3]]
@@ -34,16 +37,14 @@ def flatShader(**kwargs):
     texCoords = kwargs["texCoords"]
     texture = kwargs["texture"]
     normal = kwargs["triangleNormal"]
-    
     dLight = kwargs["dLight"]
-    dLight = np.array(dLight)
     
     color = [1, 1, 1]
     
     if texture != None:
         color = texture.getColor(texCoords[0], texCoords[1])
     
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, -dLight)
     
     color = [max(0, min(1, c * intensity)) for c in color]
     
@@ -60,8 +61,6 @@ def gouradShader(**kwargs):
             u * nA[1] + v * nB[1] + w * nC[1],
             u * nA[2] + v * nB[2] + w * nC[2]]
     
-    dLight = np.array(dLight)
-    
     color = [1, 1, 1]
     
     if texture != None:
@@ -70,7 +69,7 @@ def gouradShader(**kwargs):
         textureColor = texture.getColor(tU, tV)
         color = [c * t for c, t in zip(color, textureColor)]
     
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, -dLight)
     
     color = [max(0, min(1, c * intensity)) for c in color]
     
@@ -86,11 +85,9 @@ def thermalToonShader(**kwargs):
     normal=[u * nA[0] + v * nB[0] + w * nC[0],
             u * nA[1] + v * nB[1] + w * nC[1],
             u * nA[2] + v * nB[2] + w * nC[2]]
-    
-    dLight = np.array(dLight)
-    
+        
     color = [1, 1, 1]
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, -dLight)
     
     if intensity > 0.85:
         color = [1, 0, 0]
@@ -125,11 +122,9 @@ def negativeToonShader(**kwargs):
     normal=[u * nA[0] + v * nB[0] + w * nC[0],
             u * nA[1] + v * nB[1] + w * nC[1],
             u * nA[2] + v * nB[2] + w * nC[2]]
-    
-    dLight = np.array(dLight)
-    
+
     color = [1, 1, 1]
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, -dLight)
     
     if intensity > 0.85:
         color = [0, 0, 0]
@@ -165,8 +160,6 @@ def xRayShader(**kwargs):
             u * nA[1] + v * nB[1] + w * nC[1],
             u * nA[2] + v * nB[2] + w * nC[2]]
     
-    dLight = np.array(dLight)
-    
     color = [1, 1, 1]
     
     if texture != None:
@@ -189,9 +182,7 @@ def textureLoaderShader(**kwargs):
             u * nA[1] + v * nB[1] + w * nC[1],
             u * nA[2] + v * nB[2] + w * nC[2]]
     
-    dLight = np.array(dLight)
-    
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, -dLight)
     
     color = [0.65, 0.65, 0.65]
     
@@ -223,9 +214,7 @@ def removeTextureShader(**kwargs):
             u * nA[1] + v * nB[1] + w * nC[1],
             u * nA[2] + v * nB[2] + w * nC[2]]
     
-    dLight = np.array(dLight)
-    
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, -dLight)
     
     color = [0.65, 0.65, 0.65]
     
@@ -258,9 +247,7 @@ def transparentShader(**kwargs):
             u * nA[1] + v * nB[1] + w * nC[1],
             u * nA[2] + v * nB[2] + w * nC[2]]
     
-    dLight = np.array(dLight)
-    
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, -dLight)
     
     color = [0.65, 0.65, 0.65]
     
@@ -417,8 +404,7 @@ def gradient(**kwargs):
               u * nA[1] + v * nB[1] + w * nC[1],
               u * nA[2] + v * nB[2] + w * nC[2]]
 
-    dLight = np.array(dLight)
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, -dLight)
 
     color_start = [1, 0, 0]
     color_end = [0, 0, 1]
@@ -448,8 +434,7 @@ def nightVision(**kwargs):
             u * nA[1] + v * nB[1] + w * nC[1],
             u * nA[2] + v * nB[2] + w * nC[2]]
     
-    dLight = np.array(dLight)
-    intensity = np.dot(normal, -dLight)
+    intensity = dot(normal, negative(dLight))
     color = [0.4, 0.6, 0.2]
     saturation = 0
     

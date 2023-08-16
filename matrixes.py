@@ -130,3 +130,14 @@ def norm(arr):
     # Calculate the square root of the sum of squares to get the norm
     norm = math.sqrt(sum_of_squares)
     return norm
+
+def dot(list1, list2):
+    if len(list1) != len(list2):
+        raise ValueError("Input arrays must have the same length")
+
+    # Calculate the dot product
+    dot_product = sum(x * y for x, y in zip(list1, list2))
+    return dot_product
+
+def negative(list):
+    return [-element for element in list]
