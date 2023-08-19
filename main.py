@@ -2,17 +2,17 @@ from gl import Renderer
 import shaders
 
 # Modifiable parameters for the render
-modelPath = "models/pumpkin.obj"
-texturePath = "textures/pumpkin.bmp"
+modelPath = "models/fish.obj"
+texturePath = "textures/fish.bmp"
 
-width = 512
+width = 1000
 height = 512
 
-scale = 4
+scale = 1
 
 render = Renderer(width, height)
 render.glDirectionalLightDirection(1.3, 0.5, 1.2)
-render.glClearColor(0.65, 0.65, 0.65)
+render.glClearColor(0.5, 0.5, 0.5)
 render.glClear()
 render.vertexShader = shaders.vertexShader
 
@@ -185,6 +185,18 @@ def nightVision(outputPath):
     render.glRender()
     render.glFinish(outputPath)
     
+def noShader(outputPath):
+    render.fragmentShader = shaders.noShader
+
+    render.glLoadModel(filename = modelPath,
+                     textureName = texturePath,
+                     translate = (0, -1, -5),
+                     rotate = (0, 45, 0),
+                     scale = (scale, scale, scale))
+
+    render.glRender()
+    render.glFinish(outputPath)
+    
 # gouradShader("output/shaders/gourad.bmp")
 # thermalToonShader("output/shaders/thermalToon.bmp")
 # negativeThermalShader("output/shaders/negativeThermal.bmp")
@@ -198,4 +210,5 @@ def nightVision(outputPath):
 # colorTinting("output/shaders/colorTinting.bmp")
 # posterization("output/shaders/posterization.bmp")
 # gradient("output/shaders/gradient.bmp")
-nightVision("output/shaders/nightVision.bmp")
+# nightVision("output/shaders/nightVision.bmp")
+noShader("output/shaders/noShader.bmp")

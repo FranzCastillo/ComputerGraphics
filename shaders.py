@@ -69,7 +69,7 @@ def gouradShader(**kwargs):
         textureColor = texture.getColor(tU, tV)
         color = [c * t for c, t in zip(color, textureColor)]
     
-    intensity = dot(normal, -dLight)
+    intensity = dot(normal, negative(dLight))
     
     color = [max(0, min(1, c * intensity)) for c in color]
     
@@ -404,7 +404,7 @@ def gradient(**kwargs):
               u * nA[1] + v * nB[1] + w * nC[1],
               u * nA[2] + v * nB[2] + w * nC[2]]
 
-    intensity = dot(normal, -dLight)
+    intensity = dot(normal, negative(dLight))
 
     color_start = [1, 0, 0]
     color_end = [0, 0, 1]
@@ -462,5 +462,21 @@ def nightVision(**kwargs):
         blue = min(1, max(0, blue))
         
         color = [red, green, blue]
+        
+    return color
+
+def noShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    u, v, w = kwargs["bCoords"]
+    
+    color = [0.65, 0.65, 0.65]
+    
+    if texture != None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        
+        color = textureColor
         
     return color
