@@ -4,6 +4,7 @@ from math import pi, sin, cos, tan
 from mathLibrary import *
 from model import Model
 from matrixes import *
+from texture import Texture
 
 def char(c):
     # 1 byte
@@ -38,6 +39,7 @@ class Renderer(object):
         self.fragmentShader = None
         self.primitiveType = TRIANGLES
         self.activeTexture = None
+        self.background = None
         
         self.direcitonalLigth = (0, 0, -1)
         
@@ -60,6 +62,21 @@ class Renderer(object):
     
     def glClearColor(self, r, g, b):
         self.clearColor = color(r,g,b)
+        
+    def glBackgroundTexture(self, filename):
+        self.backgroundTexture = Texture(filename)
+    
+    def glClearBackground(self):
+        self.glClear()
+
+        if self.backgroundTexture:
+            for x in range(self.vpX, self.vpX+self.vpWidth+1):
+                for y in range(self.vpY, self.vpY+self.vpHeight+1):
+                    u=(x-self.vpX)/self.vpWidth
+                    v=(y-self.vpY)/self.vpHeight
+                    texColor = self.backgroundTexture.getColor(u, v)
+                    if texColor:
+                        self.glPoint(x,y,color(texColor[0],texColor[1],texColor[2]))
 
     def glPoint(self, x, y, clr = None):
         if (0 <= x < self.width) and (0 <= y < self.height):

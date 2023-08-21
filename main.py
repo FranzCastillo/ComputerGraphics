@@ -4,186 +4,19 @@ import shaders
 # Modifiable parameters for the render
 modelPath = "models/fish.obj"
 texturePath = "textures/fish.bmp"
+backgroundPath = "backgrounds/PARK.bmp"
 
-width = 1000
-height = 512
+width = 1920
+height = 1080
 
 scale = 1
 
 render = Renderer(width, height)
 render.glDirectionalLightDirection(1.3, 0.5, 1.2)
-render.glClearColor(0.5, 0.5, 0.5)
-render.glClear()
+render.glBackgroundTexture(backgroundPath)
+render.glClearBackground()
 render.vertexShader = shaders.vertexShader
 
-
-def gouradShader(outputPath):
-    render.fragmentShader = shaders.gouradShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 0, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def thermalToonShader(outputPath):
-    render.fragmentShader = shaders.thermalToonShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def negativeThermalShader(outputPath):
-    render.fragmentShader = shaders.negativeToonShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def xRay(outputPath):
-    render.fragmentShader = shaders.xRayShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def textureLoader(outputPath):
-    render.fragmentShader = shaders.textureLoaderShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def textureRemover(outputPath):
-    render.fragmentShader = shaders.removeTextureShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def transparent(outputPath):
-    render.fragmentShader = shaders.transparentShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def blackAndWhite(outputPath):
-    render.fragmentShader = shaders.blackAndWhite
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def contrast(outputPath):
-    render.fragmentShader = shaders.contrastShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def adjustedContrast(outputPath):
-    render.fragmentShader = shaders.adjustedContrast
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def colorTinting(outputPath):
-    render.fragmentShader = shaders.colorTinting
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def posterization(outputPath):
-    render.fragmentShader = shaders.posterizationShader
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def gradient(outputPath):
-    render.fragmentShader = shaders.gradient
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
-    
-def nightVision(outputPath):
-    render.fragmentShader = shaders.nightVision
-
-    render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (0, -1, -5),
-                     rotate = (0, 45, 0),
-                     scale = (scale, scale, scale))
-
-    render.glRender()
-    render.glFinish(outputPath)
     
 def noShader(outputPath):
     render.fragmentShader = shaders.noShader
