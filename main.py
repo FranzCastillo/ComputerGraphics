@@ -2,7 +2,7 @@ from gl import Renderer
 import shaders
 
 backgroundPath = "backgrounds/PARK.bmp"
-outputPath = "output/scene/park.bmp"
+outputPath = "output/scene/parkWithShaders.bmp"
 
 width = 1920
 height = 1080
@@ -16,48 +16,71 @@ render.vertexShader = shaders.vertexShader
 
 def loadFish(tx, ty, tz, rx, ry, rz):
     modelPath = "models/fish.obj"
-    texturePath = "textures/fish.bmp"
+    texturePathFish = "textures/fish.bmp"
     scale = 0.1
     
-    render.fragmentShader = shaders.noShader
+    render.fragmentShader = shaders.colorTinting
 
     render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
+                     textureName = texturePathFish,
                      translate = (tx, ty, tz),
                      rotate = (rx, ry, rz),
                      scale = (scale, scale, scale))
     
+    render.glRender()
+    
 def loadDog():
     modelPath = "models/dog.obj"
-    texturePath = "textures/dog.bmp"
+    texturePathDog = "textures/dog.bmp"
     scale = 0.2
     
-    render.fragmentShader = shaders.noShader
+    render.fragmentShader = shaders.adjustedContrast
 
     render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
+                     textureName = texturePathDog,
                      translate = (-2, -2.4, -5),
                      rotate = (0, 45, 0),
                      scale = (scale, scale, scale))
+    render.glRender()
     
-def loadSquirrel():
+    
+def loadGuy():
     modelPath = "models/guy.obj"
-    texturePath = "textures/guy.bmp"
-    scale = 0.05
-    
-    render.fragmentShader = shaders.noShader
+    texturePathGuy = "textures/guy.bmp"
+    scale = 0.045
+    render.glDirectionalLightDirection(-5, 0, 0)
+    render.fragmentShader = shaders.ghostShader
 
     render.glLoadModel(filename = modelPath,
-                     textureName = texturePath,
-                     translate = (2, -2.4, -5),
-                     rotate = (0, -45, 0),
+                     textureName = texturePathGuy,
+                     translate = (-2.6, -1, -5),
+                     rotate = (0, -30, 0),
                      scale = (scale, scale, scale))
+    
+    render.glRender()
+    
+    
+def loadHelicopter():
+    modelPath = "models/helicopter.obj"
+    texturePathGuy = "textures/helicopter.bmp"
+    scale = 0.01
+    
+    render.glDirectionalLightDirection(2, -2, -2)
+    render.fragmentShader = shaders.camouflageShader
 
-# loadFish(0.9, -1, -5, 35, 30, -25)
-# loadFish(1.3, -1.3, -5, 35, 30, -25)
-# loadFish(1.43, -0.9, -5, 35, 30, -25)
-# loadDog()
-loadSquirrel()
+    render.glLoadModel(filename = modelPath,
+                     textureName = texturePathGuy,
+                     translate = (-1.9, 2, -5),
+                     rotate = (0, -30, 0),
+                     scale = (scale, scale, scale))
+    
+    render.glRender()
 
-render.glRender()
+loadFish(0.9, -1, -5, 35, 30, -25)
+loadFish(1.3, -1.3, -5, 35, 30, -25)
+loadFish(1.43, -0.9, -5, 35, 30, -25)
+loadDog()
+loadGuy()
+loadHelicopter()
+
 render.glFinish(outputPath)

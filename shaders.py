@@ -71,6 +71,9 @@ def gouradShader(**kwargs):
     
     intensity = dot(normal, negative(dLight))
     
+    intensity_factor = 0.3
+    intensity = max(0, intensity * intensity_factor)
+    
     color = [max(0, min(1, c * intensity)) for c in color]
     
     return color
@@ -87,7 +90,7 @@ def thermalToonShader(**kwargs):
             u * nA[2] + v * nB[2] + w * nC[2]]
         
     color = [1, 1, 1]
-    intensity = dot(normal, -dLight)
+    intensity = dot(normal, negative(dLight))
     
     if intensity > 0.85:
         color = [1, 0, 0]
@@ -124,7 +127,7 @@ def negativeToonShader(**kwargs):
             u * nA[2] + v * nB[2] + w * nC[2]]
 
     color = [1, 1, 1]
-    intensity = dot(normal, -dLight)
+    intensity = dot(normal, negative(dLight))
     
     if intensity > 0.85:
         color = [0, 0, 0]
@@ -345,9 +348,9 @@ def colorTinting(**kwargs):
         green = textureColor[1]
         blue = textureColor[2]
         
-        tintFactor = 0.2
+        tintFactor = 0.5
         
-        redTint, greenTint, blueTint = 0, 0, 0.5
+        redTint, greenTint, blueTint = 0.38, 0.69, 1
         
         tintedRed = red * redTint
         tintedGreen = green * greenTint
@@ -377,7 +380,7 @@ def posterizationShader(**kwargs):
         tV = tA[1] * u + tB[1] * v + tC[1] * w
         textureColor = texture.getColor(tU, tV)
         
-        levels = 6
+        levels = 8
         
         step = 1.0 / levels
         
@@ -480,3 +483,67 @@ def noShader(**kwargs):
         color = textureColor
         
     return color
+
+def ghostShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+    
+    normal = [u * nA[0] + v * nB[0] + w * nC[0],
+              u * nA[1] + v * nB[1] + w * nC[1],
+              u * nA[2] + v * nB[2] + w * nC[2]]
+    
+    color = [0.2, 0.7, 0.9]
+    
+    if texture is not None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        color = [c * t for c, t in zip(color, textureColor)]
+    
+    intensity = dot(normal, negative(dLight))
+    
+    intensity_factor = 0.5
+    intensity = max(0, intensity * intensity_factor)
+
+    
+    color = [max(0, min(1, c * intensity)) for c in color]
+    
+    return color
+
+def camouflageShader(**kwargs):
+    texture = kwargs["texture"]
+    tA, tB, tC = kwargs["texCoords"]
+    nA, nB, nC = kwargs["normals"]
+    dLight = kwargs["dLight"]
+    u, v, w = kwargs["bCoords"]
+    
+    normal = [u * nA[0] + v * nB[0] + w * nC[0],
+              u * nA[1] + v * nB[1] + w * nC[1],
+              u * nA[2] + v * nB[2] + w * nC[2]]
+    
+    if texture is not None:
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+        textureColor = texture.getColor(tU, tV)
+        
+        intensity = dot(normal, negative(dLight))
+        intensity_factor = 1
+        intensity = max(0, intensity * intensity_factor)
+        
+        yellow_weight = 0.7
+        brown_weight = 0.3
+        color = [
+            textureColor[0] * (1 - intensity) * yellow_weight,
+            textureColor[1] * (1 - intensity) * yellow_weight,
+            textureColor[2] * (1 - intensity) * brown_weight
+        ]
+        
+        color = [max(0, min(1, c)) for c in color]
+    else:
+        color = [1, 1, 1]
+    
+    return color
+

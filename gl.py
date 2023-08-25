@@ -306,15 +306,6 @@ class Renderer(object):
                 v2 = model.vertices[ face[2][0] - 1]
                 if vertCount == 4:
                     v3 = model.vertices[ face[3][0] - 1]
-                    
-                # triangleNormal0 = np.cross(np.subtract(v1, v0), np.subtract(v2, v0))
-                # triangleNormal0 = triangleNormal0 / np.linalg.norm(triangleNormal0)
-                # normals.append(triangleNormal0)
-                # if vertCount == 4:
-                #     triangleNormal1 = np.cross(np.subtract(v2, v0), np.subtract(v3, v0))
-                #     triangleNormal1 = triangleNormal1 / np.linalg.norm(triangleNormal1)
-                #     normals.append(triangleNormal1)
-                    
 
                 if self.vertexShader:
                     v0 = self.vertexShader(v0,
@@ -372,6 +363,8 @@ class Renderer(object):
                     normals.append(vn0)
                     normals.append(vn2)
                     normals.append(vn3)
+        
+        self.objects = []
 
         primitives = self.glPrimitiveAssembly(transformedVerts, texCoords, normals)       
 
